@@ -1,0 +1,69 @@
+---
+title: "The Impact of Big Storms on Public Health and the Economy."
+author: "Arnstein Gjestland"
+date: "16. februar 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+# Function to read ziped files. Solution due to Jack Wasey at Stackoverflow
+# In thread http://stackoverflow.com/questions/8986818/automate-zip-file-reading-in-r
+read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
+  zipfile <- tempfile()
+#  download.file(url = url, destfile = zipfile, quiet = TRUE)
+# small hack to support https
+download.file(url = url, destfile = zipfile, quiet = TRUE, method="curl")
+zipdir <- tempfile()
+  dir.create(zipdir)
+  unzip(zipfile, exdir = zipdir) # files="" so extract all
+  files <- list.files(zipdir)
+  if (is.null(filename)) {
+    if (length(files) == 1) {
+      filename <- files
+    } else {
+      stop("multiple files in zip, but no filename specified: ", paste(files, collapse = ", "))
+    }
+  } else { # filename specified
+    stopifnot(length(filename) ==1)
+    stopifnot(filename %in% files)
+  }
+  file <- paste(zipdir, files[1], sep="/")
+  do.call(FUN, args = c(list(file.path(zipdir, filename)), list(...)))
+}
+```
+
+```{r readStormData, cache=TRUE}
+#Set wd to local git directory  
+setwd('/Users/ag/Dev/gitProjects/StormData')
+# Problem downloading activity.zip from rdpeng github repository using https
+# Worked round going directly to source via http
+#zipUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+# Use utility function defined above to read in the ziped file
+#myData <- read.zip.url(zipUrl, filename="StormData.csv",FUN=read.csv, header=TRUE)
+StormData <- read.csv(bzfile("repdata-data-StormData.csv.bz2"))
+#read.table(bzfile(“file.bz2″))
+#head(myData,n=10)
+# uncomment next line to save data to local working directory
+#save(myData,file="myData.RData")
+# Save myData to local working directory and then load it. 
+# Comment out the functions above when working but uncomment before final commit so that reproducable
+# Seems a waste of bandwidth to load the dataset from the net every time we do Knit HTML
+# Uncomment next line to load data from local working directory
+#load("myData.RData")
+#check class
+class(StormData)
+names(StormData)
+```
+
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
