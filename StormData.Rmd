@@ -57,7 +57,23 @@ StormData <- read.csv(bzfile("repdata-data-StormData.csv.bz2"))
 #check class
 class(StormData)
 names(StormData)
+#the dataset is quite large so we pick the variables we need
+sdRed <- StormData[,c("EVTYPE", "FATALITIES","INJURIES","PROPDMG","CROPDMG")]
 ```
+
+```{r}
+# aggregate on event type
+sdAgg <- aggregate(sdRed[,-1], by=list(sdRed$EVTYPE),FUN=sum, na.rm=TRUE)
+# Find the 10 eventypes that give most fatalities
+sdAgg[order(sdAgg$FATALITIES, decreasing = TRUE),c('EVTYPE', 'FATALITIES')][1:10,]
+# Find the 10 eventypes that give most injuries
+sdAgg[order(sdAgg$INJURIES, decreasing = TRUE),c('EVTYPE', 'INJURIES')][1:10,]
+# Find the 10 eventypes that give most property damages
+sdAgg[order(sdAgg$PROPDMG, decreasing = TRUE),c('EVTYPE', 'PROPDMG')][1:10,]
+# Find the 10 eventypes that give most crop damages
+sdAgg[order(sdAgg$CROPDMG, decreasing = TRUE),c('EVTYPE', 'CROPDMG')][1:10,]
+```
+
 
 
 You can also embed plots, for example:
